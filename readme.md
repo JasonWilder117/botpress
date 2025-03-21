@@ -191,7 +191,8 @@ services:
     image: postgres:14
     environment:
       - POSTGRES_USER=botpress
-      - POSTGRES_PASSWORD=botpress  <<MAKE A SECURE PASSWORD!
+      - POSTGRES_PASSWORD=botpress
+         ###MAKE A SECURE PASSWORD!
       - POSTGRES_DB=botpress_db
     ports:
       - "5432:5432"
