@@ -138,6 +138,78 @@ pnpm run build
 pnpm run check
 ```
 
+### Testing Docker Compose - In Progress
+Botpress Docker Compose Setup
+This process sets up Botpress with a PostgreSQL database using Docker Compose, suitable for local development or testing.
+
+Step 1: Clone the Repository
+Clone the official Botpress repository and navigate into it:
+
+```sh
+
+git clone https://github.com/botpress/botpress.git
+cd botpress
+
+
+Create the following two files below in the root directory of the cloned repository (botpress/).
+
+File 1: Dockerfile
+
+FROM node:18-alpine
+WORKDIR /app
+RUN npm install -g pnpm
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages ./packages
+RUN pnpm install
+COPY . .
+RUN pnpm run build
+EXPOSE 3000
+CMD ["pnpm", "start"]
+File 2: docker-compose.yml
+
+
+File 2: yaml
+### docker_compose.yaml
+
+version: '3.8'
+services:
+  botpress:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgres://botpress:botpress@db:5432/botpress_db
+      - BP_PORT=3000
+      - NODE_ENV=development
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - db
+  db:
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=botpress
+      - POSTGRES_PASSWORD=botpress  <<MAKE A SECURE PASSWORD!
+      - POSTGRES_DB=botpress_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
+  
+### Step 3: Build and Run
+From the botpress/ directory, execute the following command to build and start the services:
+
+```sh
+docker-compose up --build
+
+```sh
+docker-compose down
+Optional: Use docker-compose down -v to also remove the PostgreSQL data volume for a fresh start next time.
+
 ## Licensing
 
 All packages in this repository are open-source software and licensed under the [MIT License](LICENSE). By contributing in this repository, you agree to release your code under this license as well.
